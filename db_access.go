@@ -1,14 +1,11 @@
 package main
 
 import (
-	"fmt"
+	"database/sql"
 	"log"
 	"os"
 
-	"github.com/glebarez/sqlite" // Pure go SQLite driver, checkout https://github.com/glebarez/sqlite for details
-	//"gorm.io/driver/sqlite"      // Sqlite driver based on GGO
-	"gorm.io/gorm"
-	//"gorm.io/gorm"
+	_ "github.com/mattn/go-sqlite3"
 )
 
 /*
@@ -37,49 +34,61 @@ CREATE TABLE search_table (
 */
 
 type SearchTableFts struct {
-	Uid            string `gorm:"type:text"`
-	DatasourceName string `gorm:"type:text"`
-	Title          string `gorm:"type:text"`
-	Subtitle       string `gorm:"type:text"`
-	Body           string `gorm:"type:text"`
-	Url            string `gorm:"type:text"`
+	Uid            sql.NullString
+	DatasourceName sql.NullString
+	Title          sql.NullString
+	Subtitle       sql.NullString
+	Body           sql.NullString
+	Url            sql.NullString
 }
 
 type SearchTableFtsSubset struct {
-	Uid      string `gorm:"type:text"`
-	Title    string `gorm:"type:text"`
-	Subtitle string `gorm:"type:text"`
-	Url      string `gorm:"type:text"`
-}
-
-func (SearchTableFts) TableName() string {
-	return "search_table_fts"
+	Uid      string
+	Title    string
+	Subtitle string
+	Url      string
 }
 
 func DoQuery(query string) []SearchTableFtsSubset {
-	db, err := gorm.Open(sqlite.Open(os.Getenv("HOME")+"/.config/persistory/persistory.db"), &gorm.Config{})
+	db, err := sql.Open("sqlite3", os.Getenv("HOME")+"/.config/persistory/persistory.db")
 	if err != nil {
-		log.Fatal("Flamed out trying to open the database.", err)
+		log.Fatal("Flamed out trying to open the database: ", err)
 	}
 
 	output := make([]SearchTableFtsSubset, 0)
-	fullOutput := make([]SearchTableFts, 0)
-	res := db.Where("search_table_fts match ?", query).
-		Order("rank").Limit(50).Find(&fullOutput)
-	if res.Error != nil {
-		fmt.Printf("Non-nil res on query, error %v\n", res.Error)
-	} else {
-		output = make([]SearchTableFtsSubset, len(fullOutput))
-		for index := 0; index < len(output); index++ {
-			entry := fullOutput[index]
-			fmt.Printf("Uid '%s'\n\tTitle '%s'\n\tSubtitle '%s'\n\tURL '%s'\n",
-				entry.Uid, entry.Title, entry.Subtitle, entry.Url)
+	rows, err := db.Query("SELECT * FROM search_table_fts WHERE search_table_fts match ?", query)
+	if err != nil {
+		log.Fatal("Cannot query, got error: ", err)
+	}
+	defer rows.Close()
 
-			output[index].Uid = entry.Uid
-			output[index].Title = entry.Title
-			output[index].Subtitle = entry.Subtitle
-			output[index].Url = entry.Url
+	output = make([]SearchTableFtsSubset, 0)
+
+	for rows.Next() {
+		var entry SearchTableFts
+		var newEntry SearchTableFtsSubset
+		err := rows.Scan(&entry.Uid, &entry.DatasourceName, &entry.Title, &entry.Subtitle, &entry.Body, &entry.Url)
+		if err != nil {
+			log.Fatal("Cannot scan into entry: ", err)
 		}
+
+		if entry.Uid.Valid {
+			newEntry.Uid = entry.Uid.String
+		}
+
+		if entry.Title.Valid {
+			newEntry.Title = entry.Title.String
+		}
+
+		if entry.Subtitle.Valid {
+			newEntry.Subtitle = entry.Subtitle.String
+		}
+
+		if entry.Url.Valid {
+			newEntry.Url = entry.Url.String
+		}
+
+		output = append(output, newEntry)
 	}
 
 	return output
