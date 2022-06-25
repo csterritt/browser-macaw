@@ -1,15 +1,14 @@
-# README
+### README
 
-## About
+#### About
 
-This is the official Wails Vue template.
+This is a different front-end for the BrowseParrot application. You need BrowserParrot running to use this.
 
-## Live Development
+#### How to run
 
-To run in live development mode, run `wails dev` in the project directory. In another terminal, go into the `frontend`
-directory and run `npm run dev`. The frontend dev server will run on http://localhost:34115. Connect to this in your
-browser and connect to your application.
+You can run in development mode by running the `go` command. You can build an executable
+for your OS by running `wails build`.
 
-## Building
+#### License
 
-To build a redistributable, production mode package, use `wails build`.
+MIT
