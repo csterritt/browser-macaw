@@ -63,6 +63,7 @@ func DoQuery(query string) []SearchTableFtsSubset {
 	defer rows.Close()
 
 	output = make([]SearchTableFtsSubset, 0)
+	seen := make(map[string]bool)
 
 	for rows.Next() {
 		var entry SearchTableFts
@@ -70,6 +71,15 @@ func DoQuery(query string) []SearchTableFtsSubset {
 		err := rows.Scan(&entry.Uid, &entry.DatasourceName, &entry.Title, &entry.Subtitle, &entry.Body, &entry.Url)
 		if err != nil {
 			log.Fatal("Cannot scan into entry: ", err)
+		}
+
+		if entry.Url.Valid {
+			if _, found := seen[entry.Url.String]; found {
+				continue
+			}
+
+			newEntry.Url = entry.Url.String
+			seen[entry.Url.String] = true
 		}
 
 		if entry.Uid.Valid {
@@ -82,10 +92,6 @@ func DoQuery(query string) []SearchTableFtsSubset {
 
 		if entry.Subtitle.Valid {
 			newEntry.Subtitle = entry.Subtitle.String
-		}
-
-		if entry.Url.Valid {
-			newEntry.Url = entry.Url.String
 		}
 
 		output = append(output, newEntry)
