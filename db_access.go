@@ -36,16 +36,6 @@ CREATE TABLE search_table (
 	 )
 */
 
-type SearchTable struct {
-	ID             int
-	Uid            string `gorm:"type:text"`
-	DatasourceName string `gorm:"type:text"`
-	Title          string `gorm:"type:text"`
-	Subtitle       string `gorm:"type:text"`
-	Body           string `gorm:"type:text"`
-	Url            string `gorm:"type:text"`
-}
-
 type SearchTableFts struct {
 	Uid            string `gorm:"type:text"`
 	DatasourceName string `gorm:"type:text"`
@@ -55,31 +45,41 @@ type SearchTableFts struct {
 	Url            string `gorm:"type:text"`
 }
 
-// TableName overrides the table name used by User to `profiles`
-func (SearchTable) TableName() string {
-	return "search_table"
+type SearchTableFtsSubset struct {
+	Uid      string `gorm:"type:text"`
+	Title    string `gorm:"type:text"`
+	Subtitle string `gorm:"type:text"`
+	Url      string `gorm:"type:text"`
 }
 
 func (SearchTableFts) TableName() string {
 	return "search_table_fts"
 }
 
-func DoQuery(query string) string {
+func DoQuery(query string) []SearchTableFtsSubset {
 	db, err := gorm.Open(sqlite.Open(os.Getenv("HOME")+"/.config/persistory/persistory.db"), &gorm.Config{})
 	if err != nil {
 		log.Fatal("Flamed out trying to open the database.", err)
 	}
 
-	var entry SearchTableFts
-	var output string
-	res := db.Where("search_table_fts match ?", query).Take(&entry)
+	output := make([]SearchTableFtsSubset, 0)
+	fullOutput := make([]SearchTableFts, 0)
+	res := db.Where("search_table_fts match ?", query).
+		Order("rank").Limit(50).Find(&fullOutput)
 	if res.Error != nil {
 		fmt.Printf("Non-nil res on query, error %v\n", res.Error)
 	} else {
-		fmt.Printf("res is %#v\n", res)
-		output = fmt.Sprintf("One entry:\n\tuid '%s'\n\tTitle '%s'\n\tdatasource_name '%s'\n\tsubtitle '%s'\n\tbody '%s'\n\tURL '%s'\n",
-			entry.Uid, entry.Title, entry.DatasourceName, entry.Subtitle, entry.Body, entry.Url)
-		fmt.Println(output)
+		output = make([]SearchTableFtsSubset, len(fullOutput))
+		for index := 0; index < len(output); index++ {
+			entry := fullOutput[index]
+			fmt.Printf("Uid '%s'\n\tTitle '%s'\n\tSubtitle '%s'\n\tURL '%s'\n",
+				entry.Uid, entry.Title, entry.Subtitle, entry.Url)
+
+			output[index].Uid = entry.Uid
+			output[index].Title = entry.Title
+			output[index].Subtitle = entry.Subtitle
+			output[index].Url = entry.Url
+		}
 	}
 
 	return output

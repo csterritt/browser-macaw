@@ -1,10 +1,17 @@
 <template>
   <main>
-    <div id="result" class="result">{{ data.resultText }}</div>
     <div id="input" class="input-box">
       <input id="name" v-model="data.query" autocomplete="off" class="input" type="text"/>
       <button class="btn" @click="query">Query</button>
     </div>
+
+    <ul id="result" class="result">
+      <li v-for="elem in data.results" :key="elem.Uid">
+        <div>Title: {{elem['Title']}}</div>
+        <div>Subtitle: {{elem['Subtitle']}}</div>
+        <div>Url: {{elem['Url']}}</div>
+      </li>
+    </ul>
   </main>
 </template>
 
@@ -14,12 +21,17 @@ import {Query} from '../../wailsjs/go/main/App'
 
 const data = reactive({
   query: "",
-  resultText: "Please enter your query below",
+  results: [],
 })
 
 function query() {
   Query(data.query).then(result => {
-    data.resultText = result
+    console.log("Query returns result", result)
+    if (result.length === 0) {
+      data.results = []
+    } else {
+      data.results = result
+    }
   })
 }
 </script>

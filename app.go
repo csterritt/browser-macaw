@@ -22,12 +22,10 @@ func (a *App) startup(ctx context.Context) {
 }
 
 // Query queries the database on the user's behalf
-func (a *App) Query(query string) string {
-	output := ""
+func (a *App) Query(query string) []SearchTableFtsSubset {
+	var output []SearchTableFtsSubset
 	if len(query) != 0 && len(strings.Trim(query, " \t\r\n")) != 0 {
 		output = DoQuery(query)
-	} else {
-		output = "Empty string given to query."
 	}
 
 	return output
