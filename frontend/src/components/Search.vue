@@ -2,23 +2,23 @@
   <main>
     <div id="result" class="result">{{ data.resultText }}</div>
     <div id="input" class="input-box">
-      <input id="name" v-model="data.name" autocomplete="off" class="input" type="text"/>
-      <button class="btn" @click="greet">Greet</button>
+      <input id="name" v-model="data.query" autocomplete="off" class="input" type="text"/>
+      <button class="btn" @click="query">Query</button>
     </div>
   </main>
 </template>
 
 <script setup>
 import {reactive} from 'vue'
-import {Greet} from '../../wailsjs/go/main/App'
+import {Query} from '../../wailsjs/go/main/App'
 
 const data = reactive({
-  name: "",
-  resultText: "Please enter your name below",
+  query: "",
+  resultText: "Please enter your query below",
 })
 
-function greet() {
-  Greet(data.name).then(result => {
+function query() {
+  Query(data.query).then(result => {
     data.resultText = result
   })
 }

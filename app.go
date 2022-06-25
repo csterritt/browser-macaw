@@ -2,7 +2,7 @@ package main
 
 import (
 	"context"
-	"fmt"
+	"strings"
 )
 
 // App struct
@@ -21,7 +21,14 @@ func (a *App) startup(ctx context.Context) {
 	a.ctx = ctx
 }
 
-// Greet returns a greeting for the given name
-func (a *App) Greet(name string) string {
-	return fmt.Sprintf("Hello %s, It's show time!", name)
+// Query queries the database on the user's behalf
+func (a *App) Query(query string) string {
+	output := ""
+	if len(query) != 0 && len(strings.Trim(query, " \t\r\n")) != 0 {
+		output = DoQuery(query)
+	} else {
+		output = "Empty string given to query."
+	}
+
+	return output
 }
