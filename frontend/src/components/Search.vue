@@ -5,10 +5,10 @@
         id="name"
         v-model="data.query"
         autocomplete="off"
-        class="input"
+        class="input input-bordered w-full max-w-xs"
         type="text"
       />
-      <button class="btn" @click="query">Query</button>
+      <button class="btn btn-primary" @click="query">Query</button>
     </div>
 
     <template v-if="runOneQuery">
