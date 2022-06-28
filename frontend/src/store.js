@@ -1,20 +1,50 @@
 import { defineStore } from 'pinia'
 import { Query } from '../wailsjs/go/main/App'
 
+import { ACTIVE_TAB_CLASS, INACTIVE_TAB_CLASS, SHOW_RESULTS } from './constants'
+
 // useStore could be anything like useUser, useCart
 // the first argument is a unique id of the store across your application
 export const useStore = defineStore('main', {
   state: () => ({
+    queryTabClass: ACTIVE_TAB_CLASS,
+    resultsTabClass: INACTIVE_TAB_CLASS,
+    aboutTabClass: INACTIVE_TAB_CLASS,
     oneQueryRun: false,
     query: '',
     results: [],
   }),
 
+  getters: {
+    queryTabActive: (state) => state.queryTabClass === ACTIVE_TAB_CLASS,
+    resultsTabActive: (state) => state.resultsTabClass === ACTIVE_TAB_CLASS,
+    aboutTabActive: (state) => state.aboutTabClass === ACTIVE_TAB_CLASS,
+  },
+
   actions: {
-    runQuery: function () {
+    makeQueryTabActive() {
+      this.queryTabClass = ACTIVE_TAB_CLASS
+      this.resultsTabClass = INACTIVE_TAB_CLASS
+      this.aboutTabClass = INACTIVE_TAB_CLASS
+    },
+
+    makeResultsTabActive() {
+      this.queryTabClass = INACTIVE_TAB_CLASS
+      this.resultsTabClass = ACTIVE_TAB_CLASS
+      this.aboutTabClass = INACTIVE_TAB_CLASS
+    },
+
+    makeAboutTabActive() {
+      this.queryTabClass = INACTIVE_TAB_CLASS
+      this.resultsTabClass = INACTIVE_TAB_CLASS
+      this.aboutTabClass = ACTIVE_TAB_CLASS
+    },
+
+    runQuery() {
       if (this.query.trim().length > 0) {
         Query(this.query.trim()).then((result) => {
           this.oneQueryRun = true
+          this.makeResultsTabActive()
           if (result.length === 0) {
             this.results = []
           } else {
