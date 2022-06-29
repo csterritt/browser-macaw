@@ -6,9 +6,10 @@
       autocomplete="off"
       class="input input-bordered w-full max-w-xs"
       type="text"
+      @keyup.enter="store.runQuery()"
     />
 
-    <button class="btn btn-primary" @click="store.runQuery()">Query</button>
+    <button class="btn btn-primary ml-2" @click="store.runQuery()">Query</button>
   </div>
 </template>
 

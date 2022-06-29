@@ -1,6 +1,6 @@
 <template>
-  <main>
-    <div class="tabs">
+  <main class="md:m-4">
+    <div class="tabs mb-4">
       <a :class="store.queryTabClass" @click="store.makeQueryTabActive">
         Query
       </a>
@@ -14,11 +14,13 @@
       </a>
     </div>
 
-    <query-tab v-if="store.queryTabActive"></query-tab>
+    <div class="mx-2">
+      <query-tab v-if="store.queryTabActive"></query-tab>
 
-    <results-tab v-if="store.resultsTabActive"></results-tab>
+      <results-tab v-if="store.resultsTabActive"></results-tab>
 
-    <about-tab v-if="store.aboutTabActive"></about-tab>
+      <about-tab v-if="store.aboutTabActive"></about-tab>
+    </div>
   </main>
 </template>
 
