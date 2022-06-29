@@ -3,6 +3,8 @@ package main
 import (
 	"context"
 	"strings"
+
+	"browser_macaw/db_access"
 )
 
 // App struct
@@ -22,10 +24,10 @@ func (a *App) startup(ctx context.Context) {
 }
 
 // Query queries the database on the user's behalf
-func (a *App) Query(query string) []SearchTableFtsSubset {
-	var output []SearchTableFtsSubset
+func (a *App) Query(query string) []db_access.SearchTableFtsSubset {
+	var output []db_access.SearchTableFtsSubset
 	if len(query) != 0 && len(strings.Trim(query, " \t\r\n")) != 0 {
-		output = DoQuery(query)
+		output = db_access.DoQuery(query)
 	}
 
 	return output

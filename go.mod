@@ -1,4 +1,4 @@
-module changeme
+module browser_macaw
 
 go 1.17
 

@@ -1,9 +1,11 @@
-package main
+package db_access
 
 import (
 	"database/sql"
 	"log"
 	"os"
+
+	"browser_macaw/domain_finder"
 
 	_ "github.com/mattn/go-sqlite3"
 )
@@ -43,10 +45,12 @@ type SearchTableFts struct {
 }
 
 type SearchTableFtsSubset struct {
-	Uid      string
-	Title    string
-	Subtitle string
-	Url      string
+	Uid        string
+	Title      string
+	Subtitle   string
+	Url        string
+	DomainName string
+	BodyPart   string
 }
 
 func DoQuery(query string) []SearchTableFtsSubset {
@@ -64,22 +68,16 @@ func DoQuery(query string) []SearchTableFtsSubset {
 
 	output = make([]SearchTableFtsSubset, 0)
 	seen := make(map[string]bool)
+	domainsInRankOrder := make([]string, 0)
+	resultIndexByDomain := make(map[string][]int)
 
+	outputCount := 0
 	for rows.Next() {
 		var entry SearchTableFts
 		var newEntry SearchTableFtsSubset
 		err := rows.Scan(&entry.Uid, &entry.DatasourceName, &entry.Title, &entry.Subtitle, &entry.Body, &entry.Url)
 		if err != nil {
 			log.Fatal("Cannot scan into entry: ", err)
-		}
-
-		if entry.Url.Valid {
-			if _, found := seen[entry.Url.String]; found {
-				continue
-			}
-
-			newEntry.Url = entry.Url.String
-			seen[entry.Url.String] = true
 		}
 
 		if entry.Uid.Valid {
@@ -94,8 +92,35 @@ func DoQuery(query string) []SearchTableFtsSubset {
 			newEntry.Subtitle = entry.Subtitle.String
 		}
 
-		output = append(output, newEntry)
+		if entry.Url.Valid {
+			if _, found := seen[entry.Url.String]; found {
+				continue
+			}
+
+			newEntry.Url = entry.Url.String
+			seen[entry.Url.String] = true
+			newEntry.DomainName = domain_finder.DomainFromUrl(entry.Url.String)
+
+			if _, found := resultIndexByDomain[newEntry.DomainName]; !found {
+				domainsInRankOrder = append(domainsInRankOrder, newEntry.DomainName)
+				resultIndexByDomain[newEntry.DomainName] = make([]int, 0)
+			}
+
+			resultIndexByDomain[newEntry.DomainName] = append(resultIndexByDomain[newEntry.DomainName], outputCount)
+			outputCount++
+
+			output = append(output, newEntry)
+		}
 	}
 
-	return output
+	finalOutput := make([]SearchTableFtsSubset, outputCount)
+	nextIndex := 0
+	for _, domain := range domainsInRankOrder {
+		for _, index := range resultIndexByDomain[domain] {
+			finalOutput[nextIndex] = output[index]
+			nextIndex++
+		}
+	}
+
+	return finalOutput
 }
