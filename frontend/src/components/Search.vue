@@ -14,7 +14,7 @@
       </a>
     </div>
 
-    <div class="mx-2">
+    <div class="mx-2 p-2 border border-slate-400 rounded-md">
       <query-tab v-if="store.queryTabActive"></query-tab>
 
       <results-tab v-if="store.resultsTabActive"></results-tab>

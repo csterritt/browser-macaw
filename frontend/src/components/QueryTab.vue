@@ -9,7 +9,9 @@
       @keyup.enter="store.runQuery()"
     />
 
-    <button class="btn btn-primary ml-2" @click="store.runQuery()">Query</button>
+    <button class="btn btn-primary ml-2" @click="store.runQuery()">
+      Query
+    </button>
   </div>
 </template>
 
