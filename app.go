@@ -24,8 +24,8 @@ func (a *App) startup(ctx context.Context) {
 }
 
 // Query queries the database on the user's behalf
-func (a *App) Query(query string) []db_access.SearchTableFtsSubset {
-	var output []db_access.SearchTableFtsSubset
+func (a *App) Query(query string) []db_access.ResultsByDomain {
+	var output []db_access.ResultsByDomain
 	if len(query) != 0 && len(strings.Trim(query, " \t\r\n")) != 0 {
 		output = db_access.DoQuery(query)
 	}

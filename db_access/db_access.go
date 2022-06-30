@@ -53,7 +53,12 @@ type SearchTableFtsSubset struct {
 	BodyPart   string
 }
 
-func DoQuery(query string) []SearchTableFtsSubset {
+type ResultsByDomain struct {
+	DomainName string
+	Links      []SearchTableFtsSubset
+}
+
+func DoQuery(query string) []ResultsByDomain {
 	db, err := sql.Open("sqlite3", os.Getenv("HOME")+"/.config/persistory/persistory.db")
 	if err != nil {
 		log.Fatal("Flamed out trying to open the database: ", err)
@@ -113,12 +118,12 @@ func DoQuery(query string) []SearchTableFtsSubset {
 		}
 	}
 
-	finalOutput := make([]SearchTableFtsSubset, outputCount)
-	nextIndex := 0
-	for _, domain := range domainsInRankOrder {
-		for _, index := range resultIndexByDomain[domain] {
-			finalOutput[nextIndex] = output[index]
-			nextIndex++
+	finalOutput := make([]ResultsByDomain, len(domainsInRankOrder))
+	for domainIndex, domain := range domainsInRankOrder {
+		finalOutput[domainIndex].DomainName = domain
+		finalOutput[domainIndex].Links = make([]SearchTableFtsSubset, len(resultIndexByDomain[domain]))
+		for index := range resultIndexByDomain[domain] {
+			finalOutput[domainIndex].Links[index] = output[resultIndexByDomain[domain][index]]
 		}
 	}
 
