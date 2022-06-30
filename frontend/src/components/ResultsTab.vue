@@ -9,7 +9,7 @@
         </div>
 
         <template v-for="elem in domain['Links']" :key="elem.Uid">
-          <div class="hover:bg-primary">
+          <div class="hover:bg-primary hover:text-primary-content">
             <a :href="elem['Url']" rel="nofollow" target="_blank">
               <div v-if="elem['Title']" class="ml-3">{{ elem['Title'] }}</div>
               <div v-if="elem['Subtitle']" class="ml-3">
