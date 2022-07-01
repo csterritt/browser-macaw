@@ -97,6 +97,14 @@ func DoQuery(query string) []ResultsByDomain {
 			newEntry.Subtitle = entry.Subtitle.String
 		}
 
+		if entry.Body.Valid {
+			substring := entry.Body.String
+			if len(substring) > 200 {
+				substring = substring[0:200]
+			}
+			newEntry.BodyPart = substring
+		}
+
 		if entry.Url.Valid {
 			if _, found := seen[entry.Url.String]; found {
 				continue

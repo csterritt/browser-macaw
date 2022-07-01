@@ -16,6 +16,12 @@
             <div v-if="elem['Subtitle']" class="ml-3">
               {{ elem['Subtitle'] }}
             </div>
+            <div
+              v-if="elem['BodyPart']"
+              class="ml-6 text-ellipsis overflow-hidden whitespace-nowrap"
+            >
+              {{ elem['BodyPart'] }}
+            </div>
           </a>
         </div>
 
