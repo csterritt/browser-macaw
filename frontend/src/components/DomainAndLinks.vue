@@ -1,10 +1,11 @@
 <template>
   <div class="mb-4">
     <div
-      class="text-xl text-bold mb-1 px-1 hover:bg-secondary hover:text-secondary-content"
+      class="text-xl text-bold mb-1 px-1 cursor-pointer hover:bg-secondary hover:text-secondary-content"
       @click="toggleDomainVisible"
     >
       {{ domain['DomainName'] }}
+      <span class="text-base italic">({{ linkCount() }})</span>
     </div>
 
     <template v-if="domainVisible">
@@ -26,9 +27,6 @@
 
 <script setup>
 import { ref } from 'vue'
-import { useStore } from '../store'
-
-const store = useStore()
 
 const props = defineProps({
   domain: Object,
@@ -38,5 +36,11 @@ const domainVisible = ref(false)
 
 const toggleDomainVisible = () => {
   domainVisible.value = !domainVisible.value
+}
+
+const linkCount = () => {
+  const count = props.domain['Links'].length
+  const links = count === 1 ? 'link' : 'links'
+  return `${count} ${links}`
 }
 </script>
