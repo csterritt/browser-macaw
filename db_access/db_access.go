@@ -60,6 +60,14 @@ type ResultsByDomain struct {
 	Links      []SearchTableFtsSubset
 }
 
+type Query struct {
+	Words        string
+	ExactPhrase  string
+	MustWords    string
+	MustNotWords string
+	OnlyDomain   string
+}
+
 var policy *bluemonday.Policy
 var stopWords map[string]bool
 
@@ -76,20 +84,8 @@ func init() {
 	}
 }
 
-func DoQuery(query string) []ResultsByDomain {
-	db, err := sql.Open("sqlite3", os.Getenv("HOME")+"/.config/persistory/persistory.db")
-	if err != nil {
-		log.Fatal("Flamed out trying to open the database: ", err)
-	}
-
+func resultsFromRows(query Query, rows *sql.Rows) []ResultsByDomain {
 	output := make([]SearchTableFtsSubset, 0)
-	rows, err := db.Query("SELECT * FROM search_table_fts WHERE search_table_fts match ?", query)
-	if err != nil {
-		log.Fatal("Cannot query, got error: ", err)
-	}
-	defer rows.Close()
-
-	output = make([]SearchTableFtsSubset, 0)
 	seen := make(map[string]bool)
 	domainsInRankOrder := make([]string, 0)
 	resultIndexByDomain := make(map[string][]int)
@@ -120,7 +116,7 @@ func DoQuery(query string) []ResultsByDomain {
 			findHere := strings.ToLower(substring)
 
 			min := len(findHere) + 1
-			words := strings.Split(strings.ToLower(query), " ")
+			words := strings.Split(strings.ToLower(query.Words), " ")
 			for _, word := range words {
 				if _, found := stopWords[word]; !found {
 					loc := strings.Index(findHere, word)
@@ -171,4 +167,40 @@ func DoQuery(query string) []ResultsByDomain {
 	}
 
 	return finalOutput
+}
+
+func DoWordsQuery(query Query) []ResultsByDomain {
+	db, err := sql.Open("sqlite3", os.Getenv("HOME")+"/.config/persistory/persistory.db")
+	if err != nil {
+		log.Fatal("Flamed out trying to open the database: ", err)
+	}
+
+	rows, err := db.Query("SELECT * FROM search_table_fts WHERE search_table_fts match ?", query.Words)
+	if err != nil {
+		log.Fatal("Cannot query, got error: ", err)
+	}
+	defer rows.Close()
+
+	return resultsFromRows(query, rows)
+}
+
+func DoExactPhraseQuery(query Query) []ResultsByDomain {
+	db, err := sql.Open("sqlite3", os.Getenv("HOME")+"/.config/persistory/persistory.db")
+	if err != nil {
+		log.Fatal("Flamed out trying to open the database: ", err)
+	}
+
+	phrase := query.ExactPhrase
+	if strings.Index(phrase, "\"") > -1 {
+		phrase = strings.Replace(phrase, "\"", " ", 0)
+	}
+	phrase = "\"" + phrase + "\""
+
+	rows, err := db.Query("SELECT * FROM search_table_fts WHERE search_table_fts match ?", phrase)
+	if err != nil {
+		log.Fatal("Cannot query, got error: ", err)
+	}
+	defer rows.Close()
+
+	return resultsFromRows(query, rows)
 }

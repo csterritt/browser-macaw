@@ -11,7 +11,11 @@ export const useStore = defineStore('main', {
     resultsTabClass: INACTIVE_TAB_CLASS,
     aboutTabClass: INACTIVE_TAB_CLASS,
     oneQueryRun: false,
-    query: '',
+    queryWords: '',
+    exactPhrase: '',
+    mustWords: '',
+    mustNotWords: '',
+    onlyDomain: '',
     results: [],
   }),
 
@@ -41,8 +45,18 @@ export const useStore = defineStore('main', {
     },
 
     runQuery() {
-      if (this.query.trim().length > 0) {
-        Query(this.query.trim()).then((result) => {
+      if (this.queryWords.trim().length > 0) {
+        Query({ Words: this.queryWords.trim() }).then((result) => {
+          this.oneQueryRun = true
+          this.makeResultsTabActive()
+          if (result.length === 0) {
+            this.results = []
+          } else {
+            this.results = result
+          }
+        })
+      } else if (this.exactPhrase.trim().length > 0) {
+        Query({ ExactPhrase: this.exactPhrase.trim() }).then((result) => {
           this.oneQueryRun = true
           this.makeResultsTabActive()
           if (result.length === 0) {
