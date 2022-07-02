@@ -4,12 +4,15 @@ go 1.17
 
 require (
 	github.com/mattn/go-sqlite3 v1.14.12
+	github.com/microcosm-cc/bluemonday v1.0.19
 	github.com/wailsapp/wails/v2 v2.0.0-beta.37
 )
 
 require (
+	github.com/aymerick/douceur v0.2.0 // indirect
 	github.com/go-ole/go-ole v1.2.6 // indirect
 	github.com/google/uuid v1.3.0 // indirect
+	github.com/gorilla/css v1.0.0 // indirect
 	github.com/imdario/mergo v0.3.12 // indirect
 	github.com/jchv/go-winloader v0.0.0-20210711035445-715c2860da7e // indirect
 	github.com/labstack/echo/v4 v4.7.2 // indirect

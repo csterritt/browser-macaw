@@ -4,10 +4,12 @@ import (
 	"database/sql"
 	"log"
 	"os"
+	"strings"
 
 	"browser_macaw/domain_finder"
 
 	_ "github.com/mattn/go-sqlite3"
+	"github.com/microcosm-cc/bluemonday"
 )
 
 /*
@@ -58,6 +60,22 @@ type ResultsByDomain struct {
 	Links      []SearchTableFtsSubset
 }
 
+var policy *bluemonday.Policy
+var stopWords map[string]bool
+
+func init() {
+	policy = bluemonday.UGCPolicy()
+	stopWords = map[string]bool{
+		"a":   true,
+		"an":  true,
+		"and": true,
+		"not": true,
+		"of":  true,
+		"or":  true,
+		"the": true,
+	}
+}
+
 func DoQuery(query string) []ResultsByDomain {
 	db, err := sql.Open("sqlite3", os.Getenv("HOME")+"/.config/persistory/persistory.db")
 	if err != nil {
@@ -98,7 +116,24 @@ func DoQuery(query string) []ResultsByDomain {
 		}
 
 		if entry.Body.Valid {
-			substring := entry.Body.String
+			substring := policy.Sanitize(entry.Body.String)
+			findHere := strings.ToLower(substring)
+
+			min := len(findHere) + 1
+			words := strings.Split(strings.ToLower(query), " ")
+			for _, word := range words {
+				if _, found := stopWords[word]; !found {
+					loc := strings.Index(findHere, word)
+					if loc > -1 && loc < min {
+						min = loc
+					}
+				}
+			}
+
+			if min < len(findHere)+1 {
+				substring = substring[min:len(substring)]
+			}
+
 			if len(substring) > 200 {
 				substring = substring[0:200]
 			}
