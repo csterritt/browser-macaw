@@ -11,18 +11,7 @@
     <template v-if="domainVisible">
       <template v-for="elem in domain['Links']" :key="elem.Uid">
         <div class="hover:bg-primary hover:text-primary-content">
-          <a :href="elem['Url']" rel="nofollow" target="_blank">
-            <div v-if="elem['Title']" class="ml-3">{{ elem['Title'] }}</div>
-            <div v-if="elem['Subtitle']" class="ml-3">
-              {{ elem['Subtitle'] }}
-            </div>
-            <div
-              v-if="elem['BodyPart']"
-              class="ml-6 text-ellipsis overflow-hidden whitespace-nowrap"
-            >
-              {{ elem['BodyPart'] }}
-            </div>
-          </a>
+          <result-link :elem="elem"></result-link>
         </div>
 
         <div class="divider my-1 mx-3 last-of-type:hidden"></div>
@@ -33,6 +22,8 @@
 
 <script setup>
 import { ref } from 'vue'
+
+import ResultLink from './ResultLink.vue'
 
 const props = defineProps({
   domain: Object,
