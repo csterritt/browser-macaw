@@ -45,18 +45,14 @@ export const useStore = defineStore('main', {
     },
 
     runQuery() {
-      if (this.queryWords.trim().length > 0) {
-        Query({ Words: this.queryWords.trim() }).then((result) => {
-          this.oneQueryRun = true
-          this.makeResultsTabActive()
-          if (result.length === 0) {
-            this.results = []
-          } else {
-            this.results = result
-          }
-        })
-      } else if (this.exactPhrase.trim().length > 0) {
-        Query({ ExactPhrase: this.exactPhrase.trim() }).then((result) => {
+      if (
+        this.queryWords.trim().length > 0 ||
+        this.exactPhrase.trim().length > 0
+      ) {
+        Query({
+          Words: this.queryWords.trim(),
+          ExactPhrase: this.exactPhrase.trim(),
+        }).then((result) => {
           this.oneQueryRun = true
           this.makeResultsTabActive()
           if (result.length === 0) {

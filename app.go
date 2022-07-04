@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"strings"
 
 	"browser_macaw/db_access"
 )
@@ -25,12 +24,5 @@ func (a *App) startup(ctx context.Context) {
 
 // Query queries the database on the user's behalf
 func (a *App) Query(query db_access.Query) []db_access.ResultsByDomain {
-	var output []db_access.ResultsByDomain
-	if len(query.Words) != 0 && len(strings.Trim(query.Words, " \t\r\n")) != 0 {
-		output = db_access.DoWordsQuery(query)
-	} else if len(query.ExactPhrase) != 0 && len(strings.Trim(query.ExactPhrase, " \t\r\n")) != 0 {
-		output = db_access.DoExactPhraseQuery(query)
-	}
-
-	return output
+	return db_access.DoQuery(query)
 }

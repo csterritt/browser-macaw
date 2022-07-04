@@ -17,10 +17,10 @@
       </label>
 
       <input
-          v-model="store.exactPhrase"
-          autocomplete="off"
-          class="input input-bordered w-full max-w-xs"
-          type="text"
+        v-model="store.exactPhrase"
+        autocomplete="off"
+        class="input input-bordered w-full max-w-xs"
+        type="text"
       />
 
       <label class="label mt-2">
@@ -28,32 +28,34 @@
       </label>
 
       <input
-          v-model="store.mustWords"
-          autocomplete="off"
-          class="input input-bordered w-full max-w-xs"
-          type="text"
+        v-model="store.mustWords"
+        autocomplete="off"
+        class="input input-bordered w-full max-w-xs"
+        type="text"
       />
 
       <label class="label mt-2">
-        <span class="label-text">These words must NOT occur in the results:</span>
+        <span class="label-text"
+          >These words must NOT occur in the results:</span
+        >
       </label>
 
       <input
-          v-model="store.mustNotWords"
-          autocomplete="off"
-          class="input input-bordered w-full max-w-xs"
-          type="text"
+        v-model="store.mustNotWords"
+        autocomplete="off"
+        class="input input-bordered w-full max-w-xs"
+        type="text"
       />
 
       <label class="label mt-2">
-        <span class="label-text">Only results on this web site (enter the domain name, e.g., somesite.com):</span>
+        <span class="label-text">Words in the URL that must occur:</span>
       </label>
 
       <input
-          v-model="store.onlyDomain"
-          autocomplete="off"
-          class="input input-bordered w-full max-w-xs"
-          type="text"
+        v-model="store.onlyDomain"
+        autocomplete="off"
+        class="input input-bordered w-full max-w-xs"
+        type="text"
       />
     </div>
 

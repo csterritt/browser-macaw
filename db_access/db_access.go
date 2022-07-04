@@ -2,6 +2,7 @@ package db_access
 
 import (
 	"database/sql"
+	"fmt"
 	"log"
 	"os"
 	"strings"
@@ -169,13 +170,13 @@ func resultsFromRows(query Query, rows *sql.Rows) []ResultsByDomain {
 	return finalOutput
 }
 
-func DoWordsQuery(query Query) []ResultsByDomain {
+func DoQuery(query Query) []ResultsByDomain {
 	db, err := sql.Open("sqlite3", os.Getenv("HOME")+"/.config/persistory/persistory.db")
 	if err != nil {
 		log.Fatal("Flamed out trying to open the database: ", err)
 	}
 
-	rows, err := db.Query("SELECT * FROM search_table_fts WHERE search_table_fts match ?", query.Words)
+	rows, err := buildQuery(query, db)
 	if err != nil {
 		log.Fatal("Cannot query, got error: ", err)
 	}
@@ -184,23 +185,41 @@ func DoWordsQuery(query Query) []ResultsByDomain {
 	return resultsFromRows(query, rows)
 }
 
-func DoExactPhraseQuery(query Query) []ResultsByDomain {
-	db, err := sql.Open("sqlite3", os.Getenv("HOME")+"/.config/persistory/persistory.db")
-	if err != nil {
-		log.Fatal("Flamed out trying to open the database: ", err)
+func buildQuery(query Query, db *sql.DB) (*sql.Rows, error) {
+	words := strings.Trim(query.Words, " \t\r\n")
+	hasWords := len(words) > 0
+	exactPhrase := strings.Trim(query.ExactPhrase, " \t\r\n")
+	hasExactPhrase := len(exactPhrase) > 0
+	queryText := "SELECT * FROM search_table_fts "
+	args := make([]interface{}, 0)
+
+	if hasExactPhrase {
+		if strings.Index(exactPhrase, "\"") > -1 {
+			exactPhrase = strings.Replace(exactPhrase, "\"", " ", 0)
+		}
+
+		exactPhrase = "\"" + exactPhrase + "\""
 	}
 
-	phrase := query.ExactPhrase
-	if strings.Index(phrase, "\"") > -1 {
-		phrase = strings.Replace(phrase, "\"", " ", 0)
-	}
-	phrase = "\"" + phrase + "\""
+	fmt.Printf("hasWords %v (%s), hasExactPhrase %v (%s)\n", hasWords, words, hasExactPhrase, exactPhrase)
 
-	rows, err := db.Query("SELECT * FROM search_table_fts WHERE search_table_fts match ?", phrase)
-	if err != nil {
-		log.Fatal("Cannot query, got error: ", err)
+	if hasWords && !hasExactPhrase {
+		queryText += "WHERE search_table_fts match ?"
+		args = append(args, words)
 	}
-	defer rows.Close()
 
-	return resultsFromRows(query, rows)
+	if !hasWords && hasExactPhrase {
+		queryText += "WHERE search_table_fts match ?"
+		args = append(args, exactPhrase)
+	}
+
+	if hasWords && hasExactPhrase {
+		queryText += "WHERE search_table_fts match ? AND search_table_fts match ?"
+		args = append(args, words)
+		args = append(args, exactPhrase)
+	}
+
+	fmt.Printf("Query text is '%s', args are '%#v'\n", queryText, args)
+
+	return db.Query(queryText, args...)
 }
