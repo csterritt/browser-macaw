@@ -14,12 +14,14 @@
 </template>
 
 <script setup>
+import { BrowserOpenURL } from '../../wailsjs/runtime'
+
 const props = defineProps({
   elem: Object,
 })
 
 const openUrl = () => {
   console.log(`opening URL ${props.elem['Url']}`)
-  window.open(props.elem['Url'], '_blank')
+  BrowserOpenURL(props.elem['Url'])
 }
 </script>
