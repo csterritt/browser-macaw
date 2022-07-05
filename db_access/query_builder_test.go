@@ -53,7 +53,7 @@ func TestWordsAndPhraseQuery(t *testing.T) {
 		t.Errorf("Got error %v trying to build words and phrase query", err)
 	}
 
-	expectedQueryText := QueryPrefix + WhereClause + PartialWhereClause
+	expectedQueryText := QueryPrefix + WhereClause + And + WhereClause
 	if queryText != expectedQueryText {
 		t.Errorf("Expected queryText '%s', got '%s'",
 			expectedQueryText, queryText)
@@ -75,7 +75,7 @@ func TestWordsAndUrlQuery(t *testing.T) {
 		t.Errorf("Got error %v trying to build words and url query", err)
 	}
 
-	expectedQueryText := QueryPrefix + WhereClause + UrlWhereClause
+	expectedQueryText := QueryPrefix + WhereClause + And + UrlWhereClause
 	if queryText != expectedQueryText {
 		t.Errorf("Expected queryText '%s', got '%s'",
 			expectedQueryText, queryText)

@@ -5,9 +5,9 @@ import (
 )
 
 const QueryPrefix = "SELECT * FROM search_table_fts WHERE "
-const WhereClause = "search_table_fts match ? "
-const PartialWhereClause = "AND search_table_fts match ?"
-const UrlWhereClause = "AND url like ?"
+const WhereClause = "search_table_fts match ?"
+const UrlWhereClause = "url like ?"
+const And = " AND "
 
 func buildQuery(query Query) (string, []interface{}, error) {
 	words := strings.Trim(query.Words, " \t\r\n")
@@ -39,13 +39,13 @@ func buildQuery(query Query) (string, []interface{}, error) {
 	}
 
 	if hasWords && hasExactPhrase && !hasUrl {
-		queryText += WhereClause + PartialWhereClause
+		queryText += WhereClause + And + WhereClause
 		args = append(args, words)
 		args = append(args, exactPhrase)
 	}
 
 	if hasWords && hasUrl {
-		queryText += WhereClause + UrlWhereClause
+		queryText += WhereClause + And + UrlWhereClause
 		args = append(args, words)
 		args = append(args, "%"+url+"%")
 	}
