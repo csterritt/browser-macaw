@@ -5,8 +5,8 @@
       {{ elem['Subtitle'] }}
     </div>
     <div
-        v-if="elem['BodyPart']"
-        class="ml-6 text-ellipsis overflow-hidden whitespace-nowrap"
+      v-if="elem['BodyPart']"
+      class="ml-6 text-ellipsis overflow-hidden whitespace-nowrap"
     >
       {{ elem['BodyPart'] }}
     </div>

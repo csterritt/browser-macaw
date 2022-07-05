@@ -65,3 +65,25 @@ func TestWordsAndPhraseQuery(t *testing.T) {
 			expectedArgs, args)
 	}
 }
+
+func TestWordsAndUrlQuery(t *testing.T) {
+	queryText, args, err := buildQuery(Query{
+		Words:      "quux",
+		OnlyDomain: "shazbat",
+	})
+	if err != nil {
+		t.Errorf("Got error %v trying to build words and url query", err)
+	}
+
+	expectedQueryText := QueryPrefix + WhereClause + UrlWhereClause
+	if queryText != expectedQueryText {
+		t.Errorf("Expected queryText '%s', got '%s'",
+			expectedQueryText, queryText)
+	}
+
+	expectedArgs := []string{"quux", "%shazbat%"}
+	if len(args) != 2 || args[0] != expectedArgs[0] || args[1] != expectedArgs[1] {
+		t.Errorf("Expected args '%s', got '%#v'",
+			expectedArgs, args)
+	}
+}
