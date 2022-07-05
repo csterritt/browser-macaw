@@ -2,7 +2,6 @@ package db_access
 
 import (
 	"database/sql"
-	"fmt"
 	"log"
 	"os"
 	"strings"
@@ -176,50 +175,20 @@ func DoQuery(query Query) []ResultsByDomain {
 		log.Fatal("Flamed out trying to open the database: ", err)
 	}
 
-	rows, err := buildQuery(query, db)
+	rows, err := runQuery(query, db)
 	if err != nil {
-		log.Fatal("Cannot query, got error: ", err)
+		log.Fatal("Cannot run query, got error: ", err)
 	}
 	defer rows.Close()
 
 	return resultsFromRows(query, rows)
 }
 
-func buildQuery(query Query, db *sql.DB) (*sql.Rows, error) {
-	words := strings.Trim(query.Words, " \t\r\n")
-	hasWords := len(words) > 0
-	exactPhrase := strings.Trim(query.ExactPhrase, " \t\r\n")
-	hasExactPhrase := len(exactPhrase) > 0
-	queryText := "SELECT * FROM search_table_fts "
-	args := make([]interface{}, 0)
-
-	if hasExactPhrase {
-		if strings.Index(exactPhrase, "\"") > -1 {
-			exactPhrase = strings.Replace(exactPhrase, "\"", " ", 0)
-		}
-
-		exactPhrase = "\"" + exactPhrase + "\""
+func runQuery(query Query, db *sql.DB) (*sql.Rows, error) {
+	queryText, args, err := buildQuery(query)
+	if err != nil {
+		log.Fatal("Cannot build query, got error: ", err)
 	}
-
-	fmt.Printf("hasWords %v (%s), hasExactPhrase %v (%s)\n", hasWords, words, hasExactPhrase, exactPhrase)
-
-	if hasWords && !hasExactPhrase {
-		queryText += "WHERE search_table_fts match ?"
-		args = append(args, words)
-	}
-
-	if !hasWords && hasExactPhrase {
-		queryText += "WHERE search_table_fts match ?"
-		args = append(args, exactPhrase)
-	}
-
-	if hasWords && hasExactPhrase {
-		queryText += "WHERE search_table_fts match ? AND search_table_fts match ?"
-		args = append(args, words)
-		args = append(args, exactPhrase)
-	}
-
-	fmt.Printf("Query text is '%s', args are '%#v'\n", queryText, args)
 
 	return db.Query(queryText, args...)
 }
