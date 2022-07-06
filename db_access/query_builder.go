@@ -19,6 +19,7 @@ func buildQuery(query Query) (string, []interface{}, error) {
 
 	queryText := QueryPrefix
 	args := make([]interface{}, 0)
+	haveOneAlready := false
 
 	if hasExactPhrase {
 		if strings.Index(exactPhrase, "\"") > -1 {
@@ -28,30 +29,33 @@ func buildQuery(query Query) (string, []interface{}, error) {
 		exactPhrase = "\"" + exactPhrase + "\""
 	}
 
-	if hasWords && !hasExactPhrase && !hasUrl {
+	if hasWords {
 		queryText += WhereClause
 		args = append(args, words)
+		haveOneAlready = true
 	}
 
-	if !hasWords && hasExactPhrase && !hasUrl {
-		queryText += WhereClause
+	if hasExactPhrase {
+		if haveOneAlready {
+			queryText += And + WhereClause
+		} else {
+			queryText += WhereClause
+		}
+
 		args = append(args, exactPhrase)
+		haveOneAlready = true
 	}
 
-	if hasWords && hasExactPhrase && !hasUrl {
-		queryText += WhereClause + And + WhereClause
-		args = append(args, words)
-		args = append(args, exactPhrase)
-	}
-
-	if hasWords && hasUrl {
-		queryText += WhereClause
-		args = append(args, words)
-
+	if hasUrl {
 		parts := strings.Split(url, " ")
 		for _, word := range parts {
-			queryText += And + UrlWhereClause
+			if haveOneAlready {
+				queryText += And
+			}
+
+			queryText += UrlWhereClause
 			args = append(args, "%"+word+"%")
+			haveOneAlready = true
 		}
 	}
 

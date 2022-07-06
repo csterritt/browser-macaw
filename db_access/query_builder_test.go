@@ -66,6 +66,60 @@ func TestWordsAndPhraseQuery(t *testing.T) {
 	}
 }
 
+func TestOneWordOnlyUrlQuery(t *testing.T) {
+	queryText, args, err := buildQuery(Query{
+		InUrl: "shazbat",
+	})
+	if err != nil {
+		t.Errorf("Got error %v trying to build words and url query", err)
+	}
+
+	expectedQueryText := QueryPrefix + UrlWhereClause
+	if queryText != expectedQueryText {
+		t.Errorf("Expected queryText '%s', got '%s'",
+			expectedQueryText, queryText)
+	}
+
+	expectedArgs := []string{"%shazbat%"}
+	if len(args) != len(expectedArgs) {
+		t.Errorf("Expected %d args '%s', got %d '%#v'",
+			len(expectedArgs), expectedArgs, len(args), args)
+	}
+	for index := range expectedArgs {
+		if args[index] != expectedArgs[index] {
+			t.Errorf("Expected args #%d to be '%s', got '%#v'",
+				index, expectedArgs[index], args[index])
+		}
+	}
+}
+
+func TestManyWordOnlyUrlQuery(t *testing.T) {
+	queryText, args, err := buildQuery(Query{
+		InUrl: "shazbat urgle burgle",
+	})
+	if err != nil {
+		t.Errorf("Got error %v trying to build words and url query", err)
+	}
+
+	expectedQueryText := QueryPrefix + UrlWhereClause + And + UrlWhereClause + And + UrlWhereClause
+	if queryText != expectedQueryText {
+		t.Errorf("Expected queryText '%s', got '%s'",
+			expectedQueryText, queryText)
+	}
+
+	expectedArgs := []string{"%shazbat%", "%urgle%", "%burgle%"}
+	if len(args) != len(expectedArgs) {
+		t.Errorf("Expected %d args '%s', got %d '%#v'",
+			len(expectedArgs), expectedArgs, len(args), args)
+	}
+	for index := range expectedArgs {
+		if args[index] != expectedArgs[index] {
+			t.Errorf("Expected args #%d to be '%s', got '%#v'",
+				index, expectedArgs[index], args[index])
+		}
+	}
+}
+
 func TestWordsAndOneUrlWordQuery(t *testing.T) {
 	queryText, args, err := buildQuery(Query{
 		Words: "quux",
@@ -82,9 +136,15 @@ func TestWordsAndOneUrlWordQuery(t *testing.T) {
 	}
 
 	expectedArgs := []string{"quux", "%shazbat%"}
-	if len(args) != 2 || args[0] != expectedArgs[0] || args[1] != expectedArgs[1] {
-		t.Errorf("Expected args '%s', got '%#v'",
-			expectedArgs, args)
+	if len(args) != len(expectedArgs) {
+		t.Errorf("Expected %d args '%s', got %d '%#v'",
+			len(expectedArgs), expectedArgs, len(args), args)
+	}
+	for index := range expectedArgs {
+		if args[index] != expectedArgs[index] {
+			t.Errorf("Expected args #%d to be '%s', got '%#v'",
+				index, expectedArgs[index], args[index])
+		}
 	}
 }
 
