@@ -29,6 +29,19 @@ export const useStore = defineStore('main', {
     queryTabActive: (state) => state.queryTabClass === ACTIVE_TAB_CLASS,
     resultsTabActive: (state) => state.resultsTabClass === ACTIVE_TAB_CLASS,
     aboutTabActive: (state) => state.aboutTabClass === ACTIVE_TAB_CLASS,
+    invalidInput: (state) => {
+      const queryWords = standardizeArg(state.queryWords)
+      const queryAllWords = standardizeArg(state.queryAllWords)
+      const exactPhrase = standardizeArg(state.exactPhrase)
+      const inUrl = standardizeArg(state.inUrl)
+
+      return !(
+        queryWords.length > 0 ||
+        queryAllWords.length > 0 ||
+        exactPhrase.length > 0 ||
+        inUrl.length > 0
+      )
+    },
   },
 
   actions: {

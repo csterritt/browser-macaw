@@ -78,7 +78,13 @@ func buildQuery(query Query) (string, []interface{}, error) {
 
 	if hasMustNotAppear {
 		last := len(args) - 1
-		args[last] = (args[last]).(string) + " NOT " + strings.Join(strings.Split(mustNotAppear, " "), " NOT ")
+		if last >= 0 {
+			args[last] = (args[last]).(string) + " NOT " + strings.Join(strings.Split(mustNotAppear, " "), " NOT ")
+		} else {
+			queryText += WhereClause
+			args = append(args, "NOT "+strings.Join(strings.Split(mustNotAppear, " "), " NOT "))
+		}
+
 		haveOneAlready = true
 	}
 

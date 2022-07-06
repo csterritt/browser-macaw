@@ -305,6 +305,33 @@ func TestOneWordForbiddenWordsQuery(t *testing.T) {
 	}
 }
 
+func TestJustForbiddenWordsQuery(t *testing.T) {
+	queryText, args, err := buildQuery(Query{
+		MustNotWords: "shazbat",
+	})
+	if err != nil {
+		t.Errorf("Got error %v trying to build query", err)
+	}
+
+	expectedQueryText := QueryPrefix + WhereClause
+	if queryText != expectedQueryText {
+		t.Errorf("Expected queryText '%s', got '%s'",
+			expectedQueryText, queryText)
+	}
+
+	expectedArgs := []string{"NOT shazbat"}
+	if len(args) != len(expectedArgs) {
+		t.Errorf("Expected %d args '%s', got %d '%#v'",
+			len(expectedArgs), expectedArgs, len(args), args)
+	}
+	for index := range expectedArgs {
+		if args[index] != expectedArgs[index] {
+			t.Errorf("Expected args #%d to be '%s', got '%#v'",
+				index, expectedArgs[index], args[index])
+		}
+	}
+}
+
 func TestOneWordManyForbiddenWordsQuery(t *testing.T) {
 	queryText, args, err := buildQuery(Query{
 		Words:        "foo",

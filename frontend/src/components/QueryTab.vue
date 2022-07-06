@@ -63,7 +63,13 @@
       />
     </div>
 
-    <button class="btn btn-primary ml-2 mt-4" type="submit">Query</button>
+    <button
+      class="btn btn-primary ml-2 mt-4"
+      type="submit"
+      :disabled="store.invalidInput"
+    >
+      Query
+    </button>
   </form>
 </template>
 
