@@ -8,14 +8,19 @@ const QueryPrefix = "SELECT * FROM search_table_fts WHERE "
 const WhereClause = "search_table_fts match ?"
 const UrlWhereClause = "url like ?"
 const And = " AND "
+const Not = " (NOT "
+
+func cleanArgAndFlag(param string) (string, bool) {
+	res := strings.Trim(param, " \t\r\n")
+	return res, res != ""
+}
 
 func buildQuery(query Query) (string, []interface{}, error) {
-	words := strings.Trim(query.Words, " \t\r\n")
-	hasWords := len(words) > 0
-	exactPhrase := strings.Trim(query.ExactPhrase, " \t\r\n")
-	hasExactPhrase := len(exactPhrase) > 0
-	url := strings.Trim(query.InUrl, " \t\r\n")
-	hasUrl := len(url) > 0
+	words, hasWords := cleanArgAndFlag(query.Words)
+	exactPhrase, hasExactPhrase := cleanArgAndFlag(query.ExactPhrase)
+	url, hasUrl := cleanArgAndFlag(query.InUrl)
+	//mustAppear, hasMustAppear := cleanArgAndFlag(query.MustWords)
+	mustNotAppear, hasMustNotAppear := cleanArgAndFlag(query.MustNotWords)
 
 	queryText := QueryPrefix
 	args := make([]interface{}, 0)
@@ -58,6 +63,14 @@ func buildQuery(query Query) (string, []interface{}, error) {
 			haveOneAlready = true
 		}
 	}
+
+	if hasMustNotAppear {
+		last := len(args) - 1
+		args[last] = query.Words + " NOT " + mustNotAppear
+		haveOneAlready = true
+	}
+
+	//fmt.Printf("Built query is '%s', args are '%#v'\n", queryText, args)
 
 	return queryText, args, nil
 }

@@ -7,7 +7,7 @@ func TestSimpleWordsQuery(t *testing.T) {
 		Words: "foo bar baz",
 	})
 	if err != nil {
-		t.Errorf("Got error %v trying to build simple words query", err)
+		t.Errorf("Got error %v trying to build query", err)
 	}
 
 	expectedQueryText := QueryPrefix + WhereClause
@@ -28,7 +28,7 @@ func TestSimplePhraseQuery(t *testing.T) {
 		ExactPhrase: "foo bar baz",
 	})
 	if err != nil {
-		t.Errorf("Got error %v trying to build simple phrase query", err)
+		t.Errorf("Got error %v trying to build query", err)
 	}
 
 	expectedQueryText := QueryPrefix + WhereClause
@@ -50,7 +50,7 @@ func TestWordsAndPhraseQuery(t *testing.T) {
 		ExactPhrase: "foo bar baz",
 	})
 	if err != nil {
-		t.Errorf("Got error %v trying to build words and phrase query", err)
+		t.Errorf("Got error %v trying to build query", err)
 	}
 
 	expectedQueryText := QueryPrefix + WhereClause + And + WhereClause
@@ -71,7 +71,7 @@ func TestOneWordOnlyUrlQuery(t *testing.T) {
 		InUrl: "shazbat",
 	})
 	if err != nil {
-		t.Errorf("Got error %v trying to build words and url query", err)
+		t.Errorf("Got error %v trying to build query", err)
 	}
 
 	expectedQueryText := QueryPrefix + UrlWhereClause
@@ -98,7 +98,7 @@ func TestManyWordOnlyUrlQuery(t *testing.T) {
 		InUrl: "shazbat urgle burgle",
 	})
 	if err != nil {
-		t.Errorf("Got error %v trying to build words and url query", err)
+		t.Errorf("Got error %v trying to build query", err)
 	}
 
 	expectedQueryText := QueryPrefix + UrlWhereClause + And + UrlWhereClause + And + UrlWhereClause
@@ -126,7 +126,7 @@ func TestWordsAndOneUrlWordQuery(t *testing.T) {
 		InUrl: "shazbat",
 	})
 	if err != nil {
-		t.Errorf("Got error %v trying to build words and url query", err)
+		t.Errorf("Got error %v trying to build query", err)
 	}
 
 	expectedQueryText := QueryPrefix + WhereClause + And + UrlWhereClause
@@ -154,7 +154,7 @@ func TestWordsAndManyUrlWordsQuery(t *testing.T) {
 		InUrl: "shazbat gronkle spurple",
 	})
 	if err != nil {
-		t.Errorf("Got error %v trying to build words and url query", err)
+		t.Errorf("Got error %v trying to build query", err)
 	}
 
 	expectedQueryText := QueryPrefix + WhereClause + And + UrlWhereClause + And + UrlWhereClause + And + UrlWhereClause
@@ -164,6 +164,34 @@ func TestWordsAndManyUrlWordsQuery(t *testing.T) {
 	}
 
 	expectedArgs := []string{"quux", "%shazbat%", "%gronkle%", "%spurple%"}
+	if len(args) != len(expectedArgs) {
+		t.Errorf("Expected %d args '%s', got %d '%#v'",
+			len(expectedArgs), expectedArgs, len(args), args)
+	}
+	for index := range expectedArgs {
+		if args[index] != expectedArgs[index] {
+			t.Errorf("Expected args #%d to be '%s', got '%#v'",
+				index, expectedArgs[index], args[index])
+		}
+	}
+}
+
+func TestOneWordForbiddenWordsQuery(t *testing.T) {
+	queryText, args, err := buildQuery(Query{
+		Words:        "foo",
+		MustNotWords: "shazbat",
+	})
+	if err != nil {
+		t.Errorf("Got error %v trying to build query", err)
+	}
+
+	expectedQueryText := QueryPrefix + WhereClause
+	if queryText != expectedQueryText {
+		t.Errorf("Expected queryText '%s', got '%s'",
+			expectedQueryText, queryText)
+	}
+
+	expectedArgs := []string{"foo NOT shazbat"}
 	if len(args) != len(expectedArgs) {
 		t.Errorf("Expected %d args '%s', got %d '%#v'",
 			len(expectedArgs), expectedArgs, len(args), args)
