@@ -66,10 +66,10 @@ func TestWordsAndPhraseQuery(t *testing.T) {
 	}
 }
 
-func TestWordsAndUrlQuery(t *testing.T) {
+func TestWordsAndOneUrlWordQuery(t *testing.T) {
 	queryText, args, err := buildQuery(Query{
-		Words:      "quux",
-		OnlyDomain: "shazbat",
+		Words: "quux",
+		InUrl: "shazbat",
 	})
 	if err != nil {
 		t.Errorf("Got error %v trying to build words and url query", err)
@@ -85,5 +85,33 @@ func TestWordsAndUrlQuery(t *testing.T) {
 	if len(args) != 2 || args[0] != expectedArgs[0] || args[1] != expectedArgs[1] {
 		t.Errorf("Expected args '%s', got '%#v'",
 			expectedArgs, args)
+	}
+}
+
+func TestWordsAndManyUrlWordsQuery(t *testing.T) {
+	queryText, args, err := buildQuery(Query{
+		Words: "quux",
+		InUrl: "shazbat gronkle spurple",
+	})
+	if err != nil {
+		t.Errorf("Got error %v trying to build words and url query", err)
+	}
+
+	expectedQueryText := QueryPrefix + WhereClause + And + UrlWhereClause + And + UrlWhereClause + And + UrlWhereClause
+	if queryText != expectedQueryText {
+		t.Errorf("Expected queryText '%s', got '%s'",
+			expectedQueryText, queryText)
+	}
+
+	expectedArgs := []string{"quux", "%shazbat%", "%gronkle%", "%spurple%"}
+	if len(args) != len(expectedArgs) {
+		t.Errorf("Expected %d args '%s', got %d '%#v'",
+			len(expectedArgs), expectedArgs, len(args), args)
+	}
+	for index := range expectedArgs {
+		if args[index] != expectedArgs[index] {
+			t.Errorf("Expected args #%d to be '%s', got '%#v'",
+				index, expectedArgs[index], args[index])
+		}
 	}
 }

@@ -52,7 +52,7 @@
       </label>
 
       <input
-        v-model="store.onlyDomain"
+        v-model="store.inUrl"
         autocomplete="off"
         class="input input-bordered w-full max-w-xs"
         type="text"

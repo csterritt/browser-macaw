@@ -14,7 +14,7 @@ func buildQuery(query Query) (string, []interface{}, error) {
 	hasWords := len(words) > 0
 	exactPhrase := strings.Trim(query.ExactPhrase, " \t\r\n")
 	hasExactPhrase := len(exactPhrase) > 0
-	url := strings.Trim(query.OnlyDomain, " \t\r\n")
+	url := strings.Trim(query.InUrl, " \t\r\n")
 	hasUrl := len(url) > 0
 
 	queryText := QueryPrefix
@@ -45,9 +45,14 @@ func buildQuery(query Query) (string, []interface{}, error) {
 	}
 
 	if hasWords && hasUrl {
-		queryText += WhereClause + And + UrlWhereClause
+		queryText += WhereClause
 		args = append(args, words)
-		args = append(args, "%"+url+"%")
+
+		parts := strings.Split(url, " ")
+		for _, word := range parts {
+			queryText += And + UrlWhereClause
+			args = append(args, "%"+word+"%")
+		}
 	}
 
 	return queryText, args, nil

@@ -65,7 +65,7 @@ type Query struct {
 	ExactPhrase  string
 	MustWords    string
 	MustNotWords string
-	OnlyDomain   string
+	InUrl        string
 }
 
 var policy *bluemonday.Policy

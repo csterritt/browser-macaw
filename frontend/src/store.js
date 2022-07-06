@@ -15,7 +15,7 @@ export const useStore = defineStore('main', {
     exactPhrase: '',
     mustWords: '',
     mustNotWords: '',
-    onlyDomain: '',
+    inUrl: '',
     results: [],
   }),
 
@@ -48,12 +48,12 @@ export const useStore = defineStore('main', {
       if (
         this.queryWords.trim().length > 0 ||
         this.exactPhrase.trim().length > 0 ||
-        this.onlyDomain.trim().length > 0
+        this.inUrl.trim().length > 0
       ) {
         Query({
           Words: this.queryWords.trim(),
           ExactPhrase: this.exactPhrase.trim(),
-          OnlyDomain: this.onlyDomain.trim(),
+          InUrl: this.inUrl.trim(),
         }).then((result) => {
           this.oneQueryRun = true
           this.makeResultsTabActive()
