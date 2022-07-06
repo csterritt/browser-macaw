@@ -5,10 +5,10 @@ import (
 )
 
 const QueryPrefix = "SELECT * FROM search_table_fts WHERE "
-const WhereClause = "search_table_fts match ?"
-const UrlWhereClause = "url like ?"
+const WhereClause = "(search_table_fts match ?)"
+const UrlWhereClause = "(url like ?)"
 const And = " AND "
-const Not = " (NOT "
+const Or = " OR "
 
 func cleanArgAndFlag(param string) (string, bool) {
 	res := strings.Trim(param, " \t\r\n")
@@ -17,6 +17,7 @@ func cleanArgAndFlag(param string) (string, bool) {
 
 func buildQuery(query Query) (string, []interface{}, error) {
 	words, hasWords := cleanArgAndFlag(query.Words)
+	allWords, hasAllWords := cleanArgAndFlag(query.AllWords)
 	exactPhrase, hasExactPhrase := cleanArgAndFlag(query.ExactPhrase)
 	url, hasUrl := cleanArgAndFlag(query.InUrl)
 	//mustAppear, hasMustAppear := cleanArgAndFlag(query.MustWords)
@@ -28,7 +29,7 @@ func buildQuery(query Query) (string, []interface{}, error) {
 
 	if hasExactPhrase {
 		if strings.Index(exactPhrase, "\"") > -1 {
-			exactPhrase = strings.Replace(exactPhrase, "\"", " ", 0)
+			exactPhrase = strings.ReplaceAll(exactPhrase, "\"", " ")
 		}
 
 		exactPhrase = "\"" + exactPhrase + "\""
@@ -36,7 +37,18 @@ func buildQuery(query Query) (string, []interface{}, error) {
 
 	if hasWords {
 		queryText += WhereClause
-		args = append(args, words)
+		args = append(args, strings.Join(strings.Split(words, " "), Or))
+		haveOneAlready = true
+	}
+
+	if hasAllWords {
+		if haveOneAlready {
+			queryText += And + WhereClause
+		} else {
+			queryText += WhereClause
+		}
+
+		args = append(args, strings.Join(strings.Split(allWords, " "), And))
 		haveOneAlready = true
 	}
 
@@ -66,7 +78,7 @@ func buildQuery(query Query) (string, []interface{}, error) {
 
 	if hasMustNotAppear {
 		last := len(args) - 1
-		args[last] = query.Words + " NOT " + mustNotAppear
+		args[last] = (args[last]).(string) + " NOT " + strings.Join(strings.Split(mustNotAppear, " "), " NOT ")
 		haveOneAlready = true
 	}
 

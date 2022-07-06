@@ -3,6 +3,12 @@ import { Query } from '../wailsjs/go/main/App'
 
 import { ACTIVE_TAB_CLASS, INACTIVE_TAB_CLASS, SHOW_RESULTS } from './constants'
 
+const StandardizeString = /[\r\n\t ]+/g
+
+const standardizeArg = (str) => {
+  return str.replace(StandardizeString, ' ').trim()
+}
+
 // useStore could be anything like useUser, useCart
 // the first argument is a unique id of the store across your application
 export const useStore = defineStore('main', {
@@ -12,8 +18,8 @@ export const useStore = defineStore('main', {
     aboutTabClass: INACTIVE_TAB_CLASS,
     oneQueryRun: false,
     queryWords: '',
+    queryAllWords: '',
     exactPhrase: '',
-    mustWords: '',
     mustNotWords: '',
     inUrl: '',
     results: [],
@@ -45,19 +51,25 @@ export const useStore = defineStore('main', {
     },
 
     runQuery() {
+      const queryWords = standardizeArg(this.queryWords)
+      const queryAllWords = standardizeArg(this.queryAllWords)
+      const exactPhrase = standardizeArg(this.exactPhrase)
+      const inUrl = standardizeArg(this.inUrl)
+      const mustNotWords = standardizeArg(this.mustNotWords)
+
       if (
-        this.queryWords.trim().length > 0 ||
-        this.exactPhrase.trim().length > 0 ||
-        this.inUrl.trim().length > 0 ||
-        this.mustWords.trim().length > 0 ||
-        (this.queryWords.trim().length > 0 &&
-          this.mustNotWords.trim().length > 0)
+        queryWords.length > 0 ||
+        queryAllWords.length > 0 ||
+        exactPhrase.length > 0 ||
+        inUrl.length > 0 ||
+        (queryWords.length > 0 && mustNotWords.length > 0)
       ) {
         Query({
-          Words: this.queryWords.trim(),
-          ExactPhrase: this.exactPhrase.trim(),
-          InUrl: this.inUrl.trim(),
-          MustNotWords: this.mustNotWords.trim(),
+          Words: queryWords,
+          AllWords: queryAllWords,
+          ExactPhrase: exactPhrase,
+          InUrl: inUrl,
+          MustNotWords: mustNotWords,
         }).then((result) => {
           this.oneQueryRun = true
           this.makeResultsTabActive()

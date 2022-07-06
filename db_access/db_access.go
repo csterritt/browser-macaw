@@ -62,8 +62,8 @@ type ResultsByDomain struct {
 
 type Query struct {
 	Words        string
+	AllWords     string
 	ExactPhrase  string
-	MustWords    string
 	MustNotWords string
 	InUrl        string
 }

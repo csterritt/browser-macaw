@@ -2,7 +2,7 @@ package db_access
 
 import "testing"
 
-func TestSimpleWordsQuery(t *testing.T) {
+func TestSimpleAnyWordsQuery(t *testing.T) {
 	queryText, args, err := buildQuery(Query{
 		Words: "foo bar baz",
 	})
@@ -16,10 +16,71 @@ func TestSimpleWordsQuery(t *testing.T) {
 			expectedQueryText, queryText)
 	}
 
-	expectedArgs := "foo bar baz"
-	if len(args) != 1 || args[0] != expectedArgs {
-		t.Errorf("Expected args '%s', got '%#v'",
-			expectedArgs, args)
+	expectedArgs := []string{"foo OR bar OR baz"}
+	if len(args) != len(expectedArgs) {
+		t.Errorf("Expected %d args '%s', got %d '%#v'",
+			len(expectedArgs), expectedArgs, len(args), args)
+	}
+	for index := range expectedArgs {
+		if args[index] != expectedArgs[index] {
+			t.Errorf("Expected args #%d to be '%s', got '%#v'",
+				index, expectedArgs[index], args[index])
+		}
+	}
+}
+
+func TestSimpleAllWordsQuery(t *testing.T) {
+	queryText, args, err := buildQuery(Query{
+		AllWords: "foo bar baz",
+	})
+	if err != nil {
+		t.Errorf("Got error %v trying to build query", err)
+	}
+
+	expectedQueryText := QueryPrefix + WhereClause
+	if queryText != expectedQueryText {
+		t.Errorf("Expected queryText '%s', got '%s'",
+			expectedQueryText, queryText)
+	}
+
+	expectedArgs := []string{"foo AND bar AND baz"}
+	if len(args) != len(expectedArgs) {
+		t.Errorf("Expected %d args '%s', got %d '%#v'",
+			len(expectedArgs), expectedArgs, len(args), args)
+	}
+	for index := range expectedArgs {
+		if args[index] != expectedArgs[index] {
+			t.Errorf("Expected args #%d to be '%s', got '%#v'",
+				index, expectedArgs[index], args[index])
+		}
+	}
+}
+
+func TestSimpleAnyAndAllWordsQuery(t *testing.T) {
+	queryText, args, err := buildQuery(Query{
+		Words:    "foo bar baz",
+		AllWords: "quux gronkle",
+	})
+	if err != nil {
+		t.Errorf("Got error %v trying to build query", err)
+	}
+
+	expectedQueryText := QueryPrefix + WhereClause + And + WhereClause
+	if queryText != expectedQueryText {
+		t.Errorf("Expected queryText '%s', got '%s'",
+			expectedQueryText, queryText)
+	}
+
+	expectedArgs := []string{"foo OR bar OR baz", "quux AND gronkle"}
+	if len(args) != len(expectedArgs) {
+		t.Errorf("Expected %d args '%s', got %d '%#v'",
+			len(expectedArgs), expectedArgs, len(args), args)
+	}
+	for index := range expectedArgs {
+		if args[index] != expectedArgs[index] {
+			t.Errorf("Expected args #%d to be '%s', got '%#v'",
+				index, expectedArgs[index], args[index])
+		}
 	}
 }
 
@@ -37,16 +98,22 @@ func TestSimplePhraseQuery(t *testing.T) {
 			expectedQueryText, queryText)
 	}
 
-	expectedArgs := "\"foo bar baz\""
-	if len(args) != 1 || args[0] != expectedArgs {
-		t.Errorf("Expected args '%s', got '%#v'",
-			expectedArgs, args)
+	expectedArgs := []string{"\"foo bar baz\""}
+	if len(args) != len(expectedArgs) {
+		t.Errorf("Expected %d args '%s', got %d '%#v'",
+			len(expectedArgs), expectedArgs, len(args), args)
+	}
+	for index := range expectedArgs {
+		if args[index] != expectedArgs[index] {
+			t.Errorf("Expected args #%d to be '%s', got '%#v'",
+				index, expectedArgs[index], args[index])
+		}
 	}
 }
 
-func TestWordsAndPhraseQuery(t *testing.T) {
+func TestAnyWordsAndPhraseQuery(t *testing.T) {
 	queryText, args, err := buildQuery(Query{
-		Words:       "quux",
+		AllWords:    "quux gronkle",
 		ExactPhrase: "foo bar baz",
 	})
 	if err != nil {
@@ -59,10 +126,44 @@ func TestWordsAndPhraseQuery(t *testing.T) {
 			expectedQueryText, queryText)
 	}
 
-	expectedArgs := []string{"quux", "\"foo bar baz\""}
-	if len(args) != 2 || args[0] != expectedArgs[0] || args[1] != expectedArgs[1] {
-		t.Errorf("Expected args '%s', got '%#v'",
-			expectedArgs, args)
+	expectedArgs := []string{"quux AND gronkle", "\"foo bar baz\""}
+	if len(args) != len(expectedArgs) {
+		t.Errorf("Expected %d args '%s', got %d '%#v'",
+			len(expectedArgs), expectedArgs, len(args), args)
+	}
+	for index := range expectedArgs {
+		if args[index] != expectedArgs[index] {
+			t.Errorf("Expected args #%d to be '%s', got '%#v'",
+				index, expectedArgs[index], args[index])
+		}
+	}
+}
+
+func TestAllWordsAndPhraseQuery(t *testing.T) {
+	queryText, args, err := buildQuery(Query{
+		Words:       "quux gronkle",
+		ExactPhrase: "foo bar baz",
+	})
+	if err != nil {
+		t.Errorf("Got error %v trying to build query", err)
+	}
+
+	expectedQueryText := QueryPrefix + WhereClause + And + WhereClause
+	if queryText != expectedQueryText {
+		t.Errorf("Expected queryText '%s', got '%s'",
+			expectedQueryText, queryText)
+	}
+
+	expectedArgs := []string{"quux OR gronkle", "\"foo bar baz\""}
+	if len(args) != len(expectedArgs) {
+		t.Errorf("Expected %d args '%s', got %d '%#v'",
+			len(expectedArgs), expectedArgs, len(args), args)
+	}
+	for index := range expectedArgs {
+		if args[index] != expectedArgs[index] {
+			t.Errorf("Expected args #%d to be '%s', got '%#v'",
+				index, expectedArgs[index], args[index])
+		}
 	}
 }
 
@@ -192,6 +293,62 @@ func TestOneWordForbiddenWordsQuery(t *testing.T) {
 	}
 
 	expectedArgs := []string{"foo NOT shazbat"}
+	if len(args) != len(expectedArgs) {
+		t.Errorf("Expected %d args '%s', got %d '%#v'",
+			len(expectedArgs), expectedArgs, len(args), args)
+	}
+	for index := range expectedArgs {
+		if args[index] != expectedArgs[index] {
+			t.Errorf("Expected args #%d to be '%s', got '%#v'",
+				index, expectedArgs[index], args[index])
+		}
+	}
+}
+
+func TestOneWordManyForbiddenWordsQuery(t *testing.T) {
+	queryText, args, err := buildQuery(Query{
+		Words:        "foo",
+		MustNotWords: "shazbat gronkle spurple",
+	})
+	if err != nil {
+		t.Errorf("Got error %v trying to build query", err)
+	}
+
+	expectedQueryText := QueryPrefix + WhereClause
+	if queryText != expectedQueryText {
+		t.Errorf("Expected queryText '%s', got '%s'",
+			expectedQueryText, queryText)
+	}
+
+	expectedArgs := []string{"foo NOT shazbat NOT gronkle NOT spurple"}
+	if len(args) != len(expectedArgs) {
+		t.Errorf("Expected %d args '%s', got %d '%#v'",
+			len(expectedArgs), expectedArgs, len(args), args)
+	}
+	for index := range expectedArgs {
+		if args[index] != expectedArgs[index] {
+			t.Errorf("Expected args #%d to be '%s', got '%#v'",
+				index, expectedArgs[index], args[index])
+		}
+	}
+}
+
+func TestOneWordForbiddenWordsAndExactPhraseQuery(t *testing.T) {
+	queryText, args, err := buildQuery(Query{
+		ExactPhrase:  "foo bar",
+		MustNotWords: "shazbat",
+	})
+	if err != nil {
+		t.Errorf("Got error %v trying to build query", err)
+	}
+
+	expectedQueryText := QueryPrefix + WhereClause
+	if queryText != expectedQueryText {
+		t.Errorf("Expected queryText '%s', got '%s'",
+			expectedQueryText, queryText)
+	}
+
+	expectedArgs := []string{"\"foo bar\" NOT shazbat"}
 	if len(args) != len(expectedArgs) {
 		t.Errorf("Expected %d args '%s', got %d '%#v'",
 			len(expectedArgs), expectedArgs, len(args), args)

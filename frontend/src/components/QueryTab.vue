@@ -2,7 +2,22 @@
   <form class="input-box" @submit.prevent="store.runQuery()">
     <div class="form-control w-full max-w-xs">
       <label class="label">
-        <span class="label-text">Find any of these words:</span>
+        <span class="label-text">
+          Find all of these words (they must occur):
+        </span>
+      </label>
+
+      <input
+        v-model="store.queryAllWords"
+        autocomplete="off"
+        class="input input-bordered w-full max-w-xs"
+        type="text"
+      />
+
+      <label class="label">
+        <span class="label-text">
+          Find any of these words (they may occur):
+        </span>
       </label>
 
       <input
@@ -18,17 +33,6 @@
 
       <input
         v-model="store.exactPhrase"
-        autocomplete="off"
-        class="input input-bordered w-full max-w-xs"
-        type="text"
-      />
-
-      <label class="label mt-2">
-        <span class="label-text">These words must occur in the results:</span>
-      </label>
-
-      <input
-        v-model="store.mustWords"
         autocomplete="off"
         class="input input-bordered w-full max-w-xs"
         type="text"
