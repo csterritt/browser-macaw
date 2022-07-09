@@ -3,7 +3,7 @@
     <div class="form-control w-full max-w-xs">
       <label class="label">
         <span class="label-text">
-          Find all of these words (they must occur):
+          Find all of these words (they all must occur):
         </span>
       </label>
 
@@ -16,7 +16,7 @@
 
       <label class="label">
         <span class="label-text">
-          Find any of these words (they may occur):
+          Find any of these words (any of them may occur):
         </span>
       </label>
 
