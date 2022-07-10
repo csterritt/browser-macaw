@@ -39,9 +39,9 @@
       />
 
       <label class="label mt-2">
-        <span class="label-text"
-          >These words must NOT occur in the results:</span
-        >
+        <span class="label-text">
+          These words must NOT occur in the results:
+        </span>
       </label>
 
       <input
