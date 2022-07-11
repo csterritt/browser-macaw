@@ -74,14 +74,14 @@
 
   <input
     type="checkbox"
-    id="my-modal-3"
+    id="query-tab-error-dialog"
     class="modal-toggle"
     :checked="showErrorDialog"
   />
   <div class="modal">
     <div class="modal-box relative">
       <label
-        for="my-modal-3"
+        for="query-tab-error-dialog"
         class="btn btn-sm btn-circle absolute right-2 top-2"
       >
         ✕
