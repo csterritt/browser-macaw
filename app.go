@@ -2,6 +2,8 @@ package main
 
 import (
 	"context"
+	"errors"
+	"fmt"
 
 	"browser_macaw/db_access"
 )
@@ -24,5 +26,10 @@ func (a *App) startup(ctx context.Context) {
 
 // Query queries the database on the user's behalf
 func (a *App) Query(query db_access.Query) ([]db_access.ResultsByDomain, error) {
-	return db_access.DoQuery(query)
+	res, err := db_access.DoQuery(query)
+	if err != nil {
+		return nil, errors.New(fmt.Sprintf("{\"message\": \"%s\"}", err))
+	} else {
+		return res, nil
+	}
 }

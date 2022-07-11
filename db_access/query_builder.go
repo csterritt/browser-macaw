@@ -15,7 +15,7 @@ func cleanArgAndFlag(param string) (string, bool) {
 	return res, res != ""
 }
 
-func buildQuery(query Query) (string, []interface{}, error) {
+func buildQuery(query Query) (string, []interface{}) {
 	words, hasWords := cleanArgAndFlag(query.Words)
 	allWords, hasAllWords := cleanArgAndFlag(query.AllWords)
 	exactPhrase, hasExactPhrase := cleanArgAndFlag(query.ExactPhrase)
@@ -90,5 +90,5 @@ func buildQuery(query Query) (string, []interface{}, error) {
 
 	//fmt.Printf("Built query is '%s', args are '%#v'\n", queryText, args)
 
-	return queryText, args, nil
+	return queryText, args
 }

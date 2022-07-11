@@ -3,7 +3,6 @@ package db_access
 import (
 	"database/sql"
 	"errors"
-	"fmt"
 	"os"
 	"strings"
 
@@ -37,6 +36,8 @@ CREATE TABLE search_table (
 		prefix='2 3 4 5'
 	 )
 */
+
+const CannotOpenMessage = "Cannot open the database -- please run BrowserParrot first to build the database."
 
 type SearchTableFts struct {
 	Uid            sql.NullString
@@ -97,7 +98,7 @@ func resultsFromRows(query Query, rows *sql.Rows) ([]ResultsByDomain, error) {
 		var newEntry SearchTableFtsSubset
 		err := rows.Scan(&entry.Uid, &entry.DatasourceName, &entry.Title, &entry.Subtitle, &entry.Body, &entry.Url)
 		if err != nil {
-			return nil, errors.New("{\"message\": \"Cannot read from the database.\"}")
+			return nil, errors.New("Cannot read from the database.")
 		}
 
 		if entry.Uid.Valid {
@@ -173,12 +174,16 @@ func resultsFromRows(query Query, rows *sql.Rows) ([]ResultsByDomain, error) {
 func DoQuery(query Query) ([]ResultsByDomain, error) {
 	db, err := sql.Open("sqlite3", os.Getenv("HOME")+"/.config/persistory/persistory.db")
 	if err != nil {
-		return nil, errors.New("{\"message\": \"Cannot open the database.\"}")
+		return nil, errors.New(CannotOpenMessage)
 	}
 
 	rows, err := runQuery(query, db)
 	if err != nil {
-		return nil, errors.New(fmt.Sprintf("{\"message\": \"Cannot query the database: '%s'\"}", err))
+		if strings.Index(err.Error(), "unable to open database") == 0 {
+			err = errors.New(CannotOpenMessage)
+		}
+
+		return nil, err
 	}
 	defer rows.Close()
 
@@ -186,10 +191,7 @@ func DoQuery(query Query) ([]ResultsByDomain, error) {
 }
 
 func runQuery(query Query, db *sql.DB) (*sql.Rows, error) {
-	queryText, args, err := buildQuery(query)
-	if err != nil {
-		return nil, errors.New(fmt.Sprintf("{\"message\": \"Cannot build the query: '%s'\"}", err))
-	}
+	queryText, args := buildQuery(query)
 
 	return db.Query(queryText, args...)
 }
