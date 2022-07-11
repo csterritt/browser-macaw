@@ -2,7 +2,8 @@ package db_access
 
 import (
 	"database/sql"
-	"log"
+	"errors"
+	"fmt"
 	"os"
 	"strings"
 
@@ -84,7 +85,7 @@ func init() {
 	}
 }
 
-func resultsFromRows(query Query, rows *sql.Rows) []ResultsByDomain {
+func resultsFromRows(query Query, rows *sql.Rows) ([]ResultsByDomain, error) {
 	output := make([]SearchTableFtsSubset, 0)
 	seen := make(map[string]bool)
 	domainsInRankOrder := make([]string, 0)
@@ -96,7 +97,7 @@ func resultsFromRows(query Query, rows *sql.Rows) []ResultsByDomain {
 		var newEntry SearchTableFtsSubset
 		err := rows.Scan(&entry.Uid, &entry.DatasourceName, &entry.Title, &entry.Subtitle, &entry.Body, &entry.Url)
 		if err != nil {
-			log.Fatal("Cannot scan into entry: ", err)
+			return nil, errors.New("{\"message\": \"Cannot read from the database.\"}")
 		}
 
 		if entry.Uid.Valid {
@@ -166,18 +167,18 @@ func resultsFromRows(query Query, rows *sql.Rows) []ResultsByDomain {
 		}
 	}
 
-	return finalOutput
+	return finalOutput, nil
 }
 
-func DoQuery(query Query) []ResultsByDomain {
+func DoQuery(query Query) ([]ResultsByDomain, error) {
 	db, err := sql.Open("sqlite3", os.Getenv("HOME")+"/.config/persistory/persistory.db")
 	if err != nil {
-		log.Fatal("Flamed out trying to open the database: ", err)
+		return nil, errors.New("{\"message\": \"Cannot open the database.\"}")
 	}
 
 	rows, err := runQuery(query, db)
 	if err != nil {
-		log.Fatal("Cannot run query, got error: ", err)
+		return nil, errors.New(fmt.Sprintf("{\"message\": \"Cannot query the database: '%s'\"}", err))
 	}
 	defer rows.Close()
 
@@ -187,7 +188,7 @@ func DoQuery(query Query) []ResultsByDomain {
 func runQuery(query Query, db *sql.DB) (*sql.Rows, error) {
 	queryText, args, err := buildQuery(query)
 	if err != nil {
-		log.Fatal("Cannot build query, got error: ", err)
+		return nil, errors.New(fmt.Sprintf("{\"message\": \"Cannot build the query: '%s'\"}", err))
 	}
 
 	return db.Query(queryText, args...)

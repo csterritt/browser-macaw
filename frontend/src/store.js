@@ -23,6 +23,7 @@ export const useStore = defineStore('main', {
     mustNotWords: '',
     inUrl: '',
     results: [],
+    errorFound: null,
   }),
 
   getters: {
@@ -77,21 +78,37 @@ export const useStore = defineStore('main', {
         inUrl.length > 0 ||
         (queryWords.length > 0 && mustNotWords.length > 0)
       ) {
-        Query({
+        return Query({
           Words: queryWords,
           AllWords: queryAllWords,
           ExactPhrase: exactPhrase,
           InUrl: inUrl,
           MustNotWords: mustNotWords,
-        }).then((result) => {
-          this.oneQueryRun = true
-          this.makeResultsTabActive()
-          if (result.length === 0) {
-            this.results = []
-          } else {
-            this.results = result
-          }
         })
+          .then((result) => {
+            this.oneQueryRun = true
+            this.makeResultsTabActive()
+            if (result.length === 0) {
+              this.results = []
+            } else {
+              this.results = result
+            }
+          })
+          .catch((err) => {
+            console.log(`Query returned error ${JSON.stringify(err, null, 2)}`)
+            try {
+              const json = JSON.parse(err)
+              console.log(`Error as JSON is ${JSON.stringify(json, null, 2)}`)
+              this.errorFound = json
+            } catch (jsonErr) {
+              console.log(
+                `Oops, caught a JSON error trying to parse that error.`
+              )
+              this.errorFound = {
+                message: 'Error found (but could not be parsed).',
+              }
+            }
+          })
       }
     },
   },

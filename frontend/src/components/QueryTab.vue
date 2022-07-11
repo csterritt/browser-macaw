@@ -1,5 +1,5 @@
 <template>
-  <form class="input-box" @submit.prevent="store.runQuery()">
+  <form class="input-box" @submit.prevent="runTheQuery">
     <div class="form-control w-full max-w-xs">
       <label class="label">
         <span class="label-text">
@@ -71,10 +71,44 @@
       Query
     </button>
   </form>
+
+  <input
+    type="checkbox"
+    id="my-modal-3"
+    class="modal-toggle"
+    :checked="showErrorDialog"
+  />
+  <div class="modal">
+    <div class="modal-box relative">
+      <label
+        for="my-modal-3"
+        class="btn btn-sm btn-circle absolute right-2 top-2"
+      >
+        ✕
+      </label>
+      <h3 class="text-lg font-bold">Something bad happened:</h3>
+      <p class="py-4">{{ errorMessage }}</p>
+    </div>
+  </div>
 </template>
 
 <script setup>
+import { ref } from 'vue'
+
 import { useStore } from '../store'
 
 const store = useStore()
+
+const showErrorDialog = ref(false)
+const errorMessage = ref('')
+
+const runTheQuery = () => {
+  console.log('Running the query...')
+  store.runQuery().then(() => {
+    if (store.errorFound != null) {
+      errorMessage.value = store.errorFound['message']
+      showErrorDialog.value = true
+    }
+  })
+}
 </script>
