@@ -37,7 +37,6 @@ const props = defineProps({
 const store = useStore()
 
 const openUrl = () => {
-  console.log(`opening URL ${props.elem['Url']}`)
   BrowserOpenURL(props.elem['Url'])
 }
 </script>
