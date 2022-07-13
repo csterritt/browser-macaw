@@ -13,7 +13,10 @@
 
   <template v-else>
     <div v-if="store.oneQueryRun">Nothing found for that query.</div>
-    <div v-else>Use the Query tab to search for something in your history. The results will appear here.</div>
+    <div v-else>
+      Use the Query tab to search for something in your history. The results
+      will appear here.
+    </div>
   </template>
 </template>
 

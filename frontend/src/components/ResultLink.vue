@@ -1,15 +1,22 @@
 <template>
-  <div class="cursor-pointer" @click="openUrl">
-    <div v-if="elem['Title']" class="ml-3">{{ elem['Title'] }}</div>
-    <div v-if="elem['Subtitle']" class="ml-3">
-      {{ elem['Subtitle'] }}
-    </div>
+  <div class="flex flex-row justify-between">
     <div
-      v-if="elem['BodyPart']"
-      class="ml-6 text-ellipsis overflow-hidden whitespace-nowrap"
+      class="mr-4 cursor-pointer w-full hover:bg-secondary hover:text-secondary-content hover:rounded-md"
+      @click="openUrl"
     >
-      {{ elem['BodyPart'] }}
+      <div v-if="elem['Title']" class="ml-3">{{ elem['Title'] }}</div>
+      <div v-if="elem['Subtitle']" class="ml-3">
+        {{ elem['Subtitle'] }}
+      </div>
+      <div
+        v-if="elem['BodyPart']"
+        class="ml-6 text-ellipsis overflow-hidden whitespace-nowrap"
+      >
+        {{ elem['BodyPart'] }}
+      </div>
     </div>
+
+    <button class="btn btn-primary">Copy</button>
   </div>
 </template>
 
