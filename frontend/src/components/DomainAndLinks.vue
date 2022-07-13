@@ -4,8 +4,13 @@
       class="text-xl text-bold mb-1 px-1 cursor-pointer"
       @click="toggleDomainVisible"
     >
-      {{ domain['DomainName'] }}
-      <span class="text-base italic">({{ linkCount() }})</span>
+      <div
+        class="px-2 hover:bg-primary hover:text-primary-content hover:rounded-md"
+      >
+        {{ domain['DomainName'] }}
+
+        <span class="text-base italic">({{ linkCount() }})</span>
+      </div>
     </div>
 
     <template v-if="domainVisible">

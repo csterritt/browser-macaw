@@ -64,6 +64,17 @@ export const useStore = defineStore('main', {
       this.aboutTabClass = ACTIVE_TAB_CLASS
     },
 
+    copyUrlToClipboard(url) {
+      const type = 'text/plain'
+      const blob = new Blob([url], { type })
+      const data = [new ClipboardItem({ [type]: blob })]
+
+      navigator.clipboard.write(data).catch((err) => {
+        // this.errorFound = `Unable to copy to the clipboard: ${err}`
+        console.log(`Unable to copy to the clipboard: ${err}`)
+      })
+    },
+
     runQuery() {
       const queryWords = standardizeArg(this.queryWords)
       const queryAllWords = standardizeArg(this.queryAllWords)
