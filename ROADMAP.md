@@ -8,3 +8,5 @@ In no particular order:
 - Build the signed application
 - Write the "About..." page with links to the icon and its license
 - Write the informational github website copy
+- Copy button next to each URL to copy it to the clipboard
+

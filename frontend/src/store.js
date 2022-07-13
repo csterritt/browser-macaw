@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { Query } from '../wailsjs/go/main/App'
 
-import { ACTIVE_TAB_CLASS, INACTIVE_TAB_CLASS, SHOW_RESULTS } from './constants'
+import { ACTIVE_TAB_CLASS, INACTIVE_TAB_CLASS } from './constants'
 
 const StandardizeString = /[\r\n\t ]+/g
 
