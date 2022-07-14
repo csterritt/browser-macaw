@@ -1,37 +1,25 @@
-## Welcome to GitHub Pages
+## BrowserMacaw
 
-You can use the [editor on GitHub](https://github.com/csterritt/browser-macaw/edit/gh-pages/index.md) to maintain and preview the content for your website in Markdown files.
+This application is just a different "front end" (the bit you see) for the wonderful:
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
+> [BrowserParrot application](https://browserparrot.com/)
 
-### Markdown
+Notably, BrowserParrot builds the database that this program uses... I
+just got on my SQL shoes and put a more complicated (but powerful!) user
+interface on BrowserParrot's data.
 
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
+**HELP TEXT COMING SOON** but I sincerely hope that the text above the "Search" tab's 
+entry fields are comprehensible.
 
-```markdown
-Syntax highlighted code block
+----
 
-# Header 1
-## Header 2
-### Header 3
+#### Resources used by this program
 
-- Bulleted
-- List
+This program's icon is derived from an icon in the Google Noto Emoji
+font.
 
-1. Numbered
-2. List
+It is used under the [*Apache Version 2.0 License*](https://www.apache.org/licenses/LICENSE-2.0).
 
-**Bold** and _Italic_ and `Code` text
 
-[Link](url) and ![Image](src)
-```
-
-For more details see [Basic writing and formatting syntax](https://docs.github.com/en/github/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax).
-
-### Jekyll Themes
-
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/csterritt/browser-macaw/settings/pages). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
-
-### Support or Contact
-
-Having trouble with Pages? Check out our [documentation](https://docs.github.com/categories/github-pages-basics/) or [contact support](https://support.github.com/contact) and we’ll help you sort it out.
+See the website [https://github.com/googlefonts/noto-emoji](https://github.com/googlefonts/noto-emoji)
+for the entire font.
