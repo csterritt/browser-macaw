@@ -1,12 +1,12 @@
-## BrowserMacaw
-
-This application is just a different "front end" (the bit you see) for the wonderful:
+#### This application is just a different "front end" (the bit you see) for the wonderful:
 
 [BrowserParrot application](https://browserparrot.com/)
 
-Notably, BrowserParrot builds the database that this program uses... I
-just got on my SQL shoes and put a more complicated (but powerful!) user
-interface on BrowserParrot's data.
+Notably, BrowserParrot builds the database that this program uses. You'll need to have it
+running (or have run it) in order for BrowserMacaw to be able to search for anything.
+
+I just got on my SQL shoes and put a more complicated (but powerful!) user interface on
+BrowserParrot's data.
 
 **HELP TEXT COMING SOON** but I sincerely hope that the text above the "Search" tab's 
 entry fields are comprehensible.
