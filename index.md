@@ -2,7 +2,7 @@
 
 This application is just a different "front end" (the bit you see) for the wonderful:
 
-> [BrowserParrot application](https://browserparrot.com/)
+[BrowserParrot application](https://browserparrot.com/)
 
 Notably, BrowserParrot builds the database that this program uses... I
 just got on my SQL shoes and put a more complicated (but powerful!) user
