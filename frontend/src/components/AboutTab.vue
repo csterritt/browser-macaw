@@ -3,7 +3,7 @@
 
   <div class="ml-4">
     <div class="mb-2 text-lg">
-      This application is just a different "front end" (the bit you see) the
+      This application is just a different "front end" (the bit you see) for the
       wonderful:
     </div>
 
