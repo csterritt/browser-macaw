@@ -59,6 +59,12 @@
       </button>
     </div>
   </div>
+
+  <div class="divider"></div>
+
+  <div class="mb-2 italic">
+    This is version 3.
+  </div>
 </template>
 
 <script setup>
