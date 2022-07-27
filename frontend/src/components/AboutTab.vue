@@ -63,7 +63,7 @@
   <div class="divider"></div>
 
   <div class="mb-2 italic">
-    This is version 3.
+    This is version 4.
   </div>
 </template>
 

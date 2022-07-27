@@ -6,12 +6,17 @@ import (
 	"fmt"
 
 	"browser_macaw/db_access"
+	"browser_macaw/debug"
+
+	"golang.design/x/clipboard"
 )
 
 // App struct
 type App struct {
 	ctx context.Context
 }
+
+var clipboardInitDone bool
 
 // NewApp creates a new App application struct
 func NewApp() *App {
@@ -32,4 +37,24 @@ func (a *App) Query(query db_access.Query) ([]db_access.ResultsByDomain, error) 
 	} else {
 		return res, nil
 	}
+}
+
+// WriteToClipboard Write the given string to the clipboard
+func (a *App) WriteToClipboard(val string) {
+	if !clipboardInitDone {
+		// Init returns an error if the package is not available for use.
+		err := clipboard.Init()
+		if err != nil {
+			//panic(err)
+			debug.DumpStringToDebugListener(fmt.Sprintf("Unable to init clipboard: %v", err))
+		} else {
+			clipboardInitDone = true
+		}
+	}
+
+	clipboard.Write(clipboard.FmtText, []byte(val))
+}
+
+func (a *App) DebugOutput(msg string) {
+	debug.DumpStringToDebugListener(msg)
 }

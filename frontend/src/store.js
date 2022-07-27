@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { Query } from '../wailsjs/go/main/App'
+import { Query, WriteToClipboard } from '../wailsjs/go/main/App'
 
 import { ACTIVE_TAB_CLASS, INACTIVE_TAB_CLASS } from './constants'
 
@@ -65,14 +65,7 @@ export const useStore = defineStore('main', {
     },
 
     copyUrlToClipboard(url) {
-      const type = 'text/plain'
-      const blob = new Blob([url], { type })
-      const data = [new ClipboardItem({ [type]: blob })]
-
-      navigator.clipboard.write(data).catch((err) => {
-        // this.errorFound = `Unable to copy to the clipboard: ${err}`
-        console.log(`Unable to copy to the clipboard: ${err}`)
-      })
+      WriteToClipboard(url)
     },
 
     runQuery() {
