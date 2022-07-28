@@ -8,6 +8,7 @@ import (
 	"browser_macaw/db_access"
 	"browser_macaw/debug"
 
+	"github.com/wailsapp/wails/v2/pkg/runtime"
 	"golang.design/x/clipboard"
 )
 
@@ -45,14 +46,17 @@ func (a *App) WriteToClipboard(val string) {
 		// Init returns an error if the package is not available for use.
 		err := clipboard.Init()
 		if err != nil {
-			//panic(err)
-			debug.DumpStringToDebugListener(fmt.Sprintf("Unable to init clipboard: %v", err))
+			msg := fmt.Sprintf("Unable to init clipboard: %v", err)
+			debug.DumpStringToDebugListener(msg)
+			runtime.LogError(a.ctx, msg)
 		} else {
 			clipboardInitDone = true
 		}
 	}
 
-	clipboard.Write(clipboard.FmtText, []byte(val))
+	if clipboardInitDone {
+		clipboard.Write(clipboard.FmtText, []byte(val))
+	}
 }
 
 func (a *App) DebugOutput(msg string) {
